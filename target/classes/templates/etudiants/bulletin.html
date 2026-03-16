@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulletin de [[${etudiant.prenom}]] [[${etudiant.nom}]]</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #8B5CF6;
+            --secondary: #EC4899;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --gradient-primary: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+            --gradient-success: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
+            --gradient-warning: linear-gradient(135deg, #F59E0B 0%, #EC4899 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bulletin-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid rgba(139,92,246,0.1);
+            border-radius: 40px;
+            padding: 3rem;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--dark);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .student-info {
+            background: rgba(139,92,246,0.05);
+            border-radius: 30px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            border: 1px solid rgba(139,92,246,0.1);
+        }
+
+        .student-info p {
+            margin: 0.8rem 0;
+            font-size: 1.1rem;
+        }
+
+        .student-info .bold {
+            font-weight: 600;
+            color: var(--primary);
+            display: inline-block;
+            width: 200px;
+        }
+
+        .moyenne-generale {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-top: 1rem;
+            padding: 1rem;
+            border-top: 2px dashed rgba(139,92,246,0.2);
+        }
+
+        .semester-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--primary);
+            display: inline-block;
+        }
+
+        .semester-info {
+            background: linear-gradient(135deg, rgba(139,92,246,0.05) 0%, rgba(236,72,153,0.05) 100%);
+            padding: 1rem;
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            margin: 1.5rem 0;
+        }
+
+        th {
+            padding: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 1rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+
+        .reprise {
+            background: rgba(245,158,11,0.05);
+            border-left: 4px solid var(--warning);
+        }
+
+        .statut-admis {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .statut-non-admis {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .statut-reprise {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .badge-note {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+
+        .badge-tresbien {
+            background: linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(236,72,153,0.1) 100%);
+            color: var(--primary);
+        }
+
+        .badge-bien {
+            background: rgba(16,185,129,0.1);
+            color: var(--success);
+        }
+
+        .badge-passable {
+            background: rgba(245,158,11,0.1);
+            color: var(--warning);
+        }
+
+        .badge-insuffisant {
+            background: rgba(239,68,68,0.1);
+            color: var(--danger);
+        }
+
+        .legend {
+            background: rgba(139,92,246,0.05);
+            border-radius: 30px;
+            padding: 2rem;
+            margin: 3rem 0;
+            border: 1px solid rgba(139,92,246,0.1);
+        }
+
+        .legend h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 0.8rem 0;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+        }
+
+        .legend-color.admis { background: var(--success); }
+        .legend-color.reprise { background: var(--warning); }
+        .legend-color.non-admis { background: var(--danger); }
+        .legend-color.tresbien { background: var(--primary); }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(139,92,246,0.3);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 1px solid rgba(139,92,246,0.2);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .btn-print {
+            background: var(--dark);
+            color: white;
+            border: none;
+        }
+
+        .btn-print:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="bulletin-card">
+        
+        <!-- En-tête -->
+        <h1>BLACK-TIGER UNIVERSITY</h1>
+        <h2>Bulletin de notes</h2>
+        <p style="text-align: center; color: var(--gray-4); margin-bottom: 2rem;">Année académique 2025-2026</p>
+
+        <!-- Informations étudiant -->
+        <div class="student-info">
+            <p><span class="bold">Nom et prénom :</span> [[${etudiant.prenom}]] [[${etudiant.nom}]]</p>
+            <p><span class="bold">Numéro étudiant :</span> [[${etudiant.numeroEtudiant}]]</p>
+            <p><span class="bold">Filière :</span> [[${etudiant.filiere != null ? etudiant.filiere : 'Informatique'}]]</p>
+            
+            <div class="moyenne-generale">
+                <i class="fas fa-star me-2"></i>
+                MOYENNE GÉNÉRALE : [[${#numbers.formatDecimal(moyenneGenerale, 1, 2)}]]/100
+            </div>
+            
+            <p style="margin-top: 1rem;">
+                <span class="bold">Statut général :</span>
+                <span th:classappend="${statutGeneral == 'Admis' ? 'statut-admis' : 'statut-non-admis'}"
+                      class="fw-bold ms-2" th:text="${statutGeneral}">Admis</span>
+                <span th:if="${statutGeneral == 'Admis'}" class="ms-2 badge-note" 
+                      th:classappend="${mentionGenerale == 'Très bien' ? 'badge-tresbien' : 
+                                      mentionGenerale == 'Bien' ? 'badge-bien' : 'badge-passable'}"
+                      th:text="' - Mention ' + ${mentionGenerale}"></span>
+            </p>
+        </div>
+
+        <!-- SESSION 1 -->
+        <div class="semester-title">
+            <i class="fas fa-1-circle me-2"></i>SESSION 1
+        </div>
+        <div class="semester-info">
+            <span class="fw-bold">Moyenne :</span> [[${#numbers.formatDecimal(moyenneS1, 1, 2)}]]/100
+            <span class="mx-3">|</span>
+            <span class="fw-bold">Statut :</span>
+            <span th:classappend="${statutS1 == 'Admis' ? 'statut-admis' : 
+                                  (statutS1 == 'Admis avec reprises' ? 'statut-reprise' : 'statut-non-admis')}"
+                  th:text="${statutS1}">Admis</span>
+            <span class="mx-3">|</span>
+            <span class="fw-bold">Mention :</span> [[${mentionS1}]]
+            <span th:if="${reprisesS1}" class="badge-note badge-warning ms-2">
+                <i class="fas fa-exclamation-triangle me-1"></i>Reprises
+            </span>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Matière</th>
+                    <th>Coefficient</th>
+                    <th>Note /100</th>
+                    <th>Statut</th>
+                    <th>Mention</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="note : ${notesS1}" th:classappend="${note.valeur < 60 ? 'reprise' : ''}">
+                    <td th:text="${note.matiere.nom}">Java EE</td>
+                    <td th:text="${note.coefficient}">1</td>
+                    <td>
+                        <span class="fw-bold" th:text="${#numbers.formatDecimal(note.valeur, 1, 2)}">74.00</span>/100
+                    </td>
+                    <td th:text="${note.valeur >= 60 ? 'Réussi' : 'Reprise'}">Réussi</td>
+                    <td>
+                        <span class="badge-note" th:classappend="${note.valeur >= 80 ? 'badge-tresbien' : 
+                                                                  note.valeur >= 70 ? 'badge-bien' :
+                                                                  note.valeur >= 60 ? 'badge-passable' : 'badge-insuffisant'}"
+                              th:text="${note.valeur >= 80 ? 'Très bien' : 
+                                        note.valeur >= 70 ? 'Bien' :
+                                        note.valeur >= 60 ? 'Passable' : 'Insuffisant'}">
+                        </span>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(notesS1)}">
+                    <td colspan="5" class="text-center py-4 text-muted">
+                        <i class="fas fa-info-circle me-2"></i>Aucune note pour la session 1
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- SESSION 2 -->
+        <div class="semester-title">
+            <i class="fas fa-2-circle me-2"></i>SESSION 2
+        </div>
+        <div class="semester-info">
+            <span class="fw-bold">Moyenne :</span> [[${#numbers.formatDecimal(moyenneS2, 1, 2)}]]/100
+            <span class="mx-3">|</span>
+            <span class="fw-bold">Statut :</span>
+            <span th:classappend="${statutS2 == 'Admis' ? 'statut-admis' : 
+                                  (statutS2 == 'Admis avec reprises' ? 'statut-reprise' : 'statut-non-admis')}"
+                  th:text="${statutS2}">Admis</span>
+            <span class="mx-3">|</span>
+            <span class="fw-bold">Mention :</span> [[${mentionS2}]]
+            <span th:if="${reprisesS2}" class="badge-note badge-warning ms-2">
+                <i class="fas fa-exclamation-triangle me-1"></i>Reprises
+            </span>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Matière</th>
+                    <th>Coefficient</th>
+                    <th>Note /100</th>
+                    <th>Statut</th>
+                    <th>Mention</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="note : ${notesS2}" th:classappend="${note.valeur < 60 ? 'reprise' : ''}">
+                    <td th:text="${note.matiere.nom}">Architecture</td>
+                    <td th:text="${note.coefficient}">1</td>
+                    <td>
+                        <span class="fw-bold" th:text="${#numbers.formatDecimal(note.valeur, 1, 2)}">85.00</span>/100
+                    </td>
+                    <td th:text="${note.valeur >= 60 ? 'Réussi' : 'Reprise'}">Réussi</td>
+                    <td>
+                        <span class="badge-note" th:classappend="${note.valeur >= 80 ? 'badge-tresbien' : 
+                                                                  note.valeur >= 70 ? 'badge-bien' :
+                                                                  note.valeur >= 60 ? 'badge-passable' : 'badge-insuffisant'}"
+                              th:text="${note.valeur >= 80 ? 'Très bien' : 
+                                        note.valeur >= 70 ? 'Bien' :
+                                        note.valeur >= 60 ? 'Passable' : 'Insuffisant'}">
+                        </span>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(notesS2)}">
+                    <td colspan="5" class="text-center py-4 text-muted">
+                        <i class="fas fa-info-circle me-2"></i>Aucune note pour la session 2
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Légende -->
+        <div class="legend">
+            <h3><i class="fas fa-info-circle me-2"></i>Légende</h3>
+            <div class="legend-item">
+                <div class="legend-color admis"></div>
+                <span>✅ Note ≥ 60 : Réussi</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color reprise"></div>
+                <span>⚠️ Note < 60 : Reprise (matière à repasser)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color non-admis"></div>
+                <span>❌ Moyenne générale < 60 : Non admis</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color tresbien"></div>
+                <span>🏅 Mentions : ≥ 80 = Très bien, ≥ 70 = Bien, ≥ 60 = Passable</span>
+            </div>
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="actions">
+            <a th:href="@{/etudiants/notes(numero=${etudiant.numeroEtudiant})}" class="btn btn-primary">
+                <i class="fas fa-list"></i>
+                Détail des notes
+            </a>
+            <a href="/etudiants/bulletin" class="btn btn-secondary">
+                <i class="fas fa-search"></i>
+                Nouvelle recherche
+            </a>
+            <button class="btn btn-print" onclick="window.print()">
+                <i class="fas fa-print"></i>
+                Imprimer
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

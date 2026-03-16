@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes · Gestion</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #8B5CF6;
+            --secondary: #EC4899;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --gradient-primary: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+            --gradient-success: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(255,255,255,0.8) !important;
+            backdrop-filter: blur(12px) saturate(180%);
+            border-bottom: 1px solid rgba(139,92,246,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            padding: 1rem 2rem !important;
+            border-radius: 0 0 30px 30px;
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .navbar-brand i {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-right: 10px;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-header {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid rgba(139,92,246,0.1);
+            border-radius: 30px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.02);
+        }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.8rem 2rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139,92,246,0.2);
+        }
+
+        .btn-add:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(139,92,246,0.3);
+            color: white;
+        }
+
+        .stats-row {
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(139,92,246,0.1);
+            border-radius: 25px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(139,92,246,0.1);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(236,72,153,0.1) 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon i {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            color: var(--gray-4);
+            font-size: 0.9rem;
+        }
+
+        .table-container {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid rgba(139,92,246,0.1);
+            border-radius: 30px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.02);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        th {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+        }
+
+        tr:hover td {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(139,92,246,0.1);
+        }
+
+        .badge-note {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .badge-reussi {
+            background: rgba(16,185,129,0.1);
+            color: var(--success);
+        }
+
+        .badge-reprise {
+            background: rgba(245,158,11,0.1);
+            color: var(--warning);
+        }
+
+        .badge-tresbien {
+            background: linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(236,72,153,0.1) 100%);
+            color: var(--primary);
+        }
+
+        .badge-bien {
+            background: rgba(16,185,129,0.1);
+            color: var(--success);
+        }
+
+        .badge-passable {
+            background: rgba(245,158,11,0.1);
+            color: var(--warning);
+        }
+
+        .badge-insuffisant {
+            background: rgba(239,68,68,0.1);
+            color: var(--danger);
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            margin: 0 3px;
+        }
+
+        .btn-edit {
+            background: rgba(139,92,246,0.1);
+            color: var(--primary);
+        }
+
+        .btn-edit:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-delete {
+            background: rgba(239,68,68,0.1);
+            color: var(--danger);
+        }
+
+        .btn-delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.8rem 2rem;
+            background: white;
+            border: 1px solid rgba(139,92,246,0.2);
+            border-radius: 50px;
+            color: var(--primary);
+            text-decoration: none;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-color: transparent;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-graduation-cap"></i>
+           BLACK-TIGER UNIVERSITY
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-chart-line me-3"></i>
+            Notes
+        </h1>
+        <a href="/notes/new" class="btn-add">
+            <i class="fas fa-plus"></i>
+            Nouvelle note
+        </a>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="stats-row">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <div class="stat-value" th:text="${notesSaisies != null ? notesSaisies : #lists.size(notes)}">0</div>
+                    <div class="stat-label">Total notes</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-value" th:if="${moyenneGenerale != null}" 
+                         th:text="${#numbers.formatDecimal(moyenneGenerale, 1, 2)}">14.50</div>
+                    <div class="stat-value" th:if="${moyenneGenerale == null}">N/A</div>
+                    <div class="stat-label">Moyenne générale</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-value" th:if="${meilleureNote != null}" 
+                         th:text="${#numbers.formatDecimal(meilleureNote, 1, 2)}">18.50</div>
+                    <div class="stat-value" th:if="${meilleureNote == null}">N/A</div>
+                    <div class="stat-label">Meilleure note</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Étudiant</th>
+                    <th>Matière</th>
+                    <th>Session</th>
+                    <th>Note /100</th>
+                    <th>Statut</th>
+                    <th>Mention</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="note : ${notes}">
+                    <td><span class="badge-id" th:text="${note.id}">1</span></td>
+                    <td>
+                        <span class="fw-500" th:text="${note.etudiant.prenom + ' ' + note.etudiant.nom}">Julie Durand</span>
+                        <br><small class="text-muted" th:text="${note.etudiant.numeroEtudiant}">2023001</small>
+                    </td>
+                    <td th:text="${note.matiere.nom}">Mathématiques</td>
+                    <td>Session [[${note.semestre}]]</td>
+                    <td>
+                        <span class="fw-bold" th:text="${#numbers.formatDecimal(note.valeur, 1, 2)}">15.50</span>/100
+                        <span th:if="${note.valeur < 60}" class="badge-note badge-reprise ms-2">Reprise</span>
+                        <span th:if="${note.valeur >= 60}" class="badge-note badge-reussi ms-2">Réussi</span>
+                    </td>
+                    <td th:text="${note.valeur >= 60 ? 'Réussi' : 'Reprise'}">Réussi</td>
+                    <td>
+                        <span class="badge-note" th:classappend="${note.valeur >= 80 ? 'badge-tresbien' : 
+                                                                  note.valeur >= 70 ? 'badge-bien' :
+                                                                  note.valeur >= 60 ? 'badge-passable' : 'badge-insuffisant'}"
+                              th:text="${note.valeur >= 80 ? 'Très bien' : 
+                                        note.valeur >= 70 ? 'Bien' :
+                                        note.valeur >= 60 ? 'Passable' : 'Insuffisant'}">
+                        </span>
+                    </td>
+                    <td>
+                        <a th:href="@{/notes/edit/{id}(id=${note.id})}" class="action-btn btn-edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a th:href="@{/notes/delete/{id}(id=${note.id})}" class="action-btn btn-delete" 
+                           onclick="return confirm('Confirmer la suppression ?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(notes)}">
+                    <td colspan="8" class="text-center py-4 text-muted">
+                        <i class="fas fa-info-circle me-2"></i>Aucune note enregistrée
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <a href="/admin/dashboard" class="btn-back">
+        <i class="fas fa-arrow-left"></i>
+        Retour au tableau de bord
+    </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
